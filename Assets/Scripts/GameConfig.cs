@@ -12,22 +12,28 @@ public class GameConfig : ScriptableObject
     private float animalCaptureRadius = 1f;
 
     [Header("Animal Settings")]
+    
     [SerializeField]
     private float animalFollowSpeed = 3f;
-    
+    [SerializeField]
+    private float animalPatrolSpeed = 1f;
+    [SerializeField]
+    private float animalPatrolRange = 1f;
+    [SerializeField]
+    private float animalPatrolOffset = 0.5f;
+
     [Header("Spawn Settings")]
     [SerializeField]
     private int animalPoolSize = 10;
     [SerializeField]
-    private float animalSpawnInterval = 5f;
-    [SerializeField]
-    private float yardOffset = -2.5f;
+    private float maxSpawnInterval = 5f;
 
     public float HeroSpeed => heroSpeed;
     public int MaxGroupSize => maxGroupSize;
     public int AnimalPoolSize => animalPoolSize;
     public float AnimalFollowSpeed => animalFollowSpeed;
+    public float AnimalPatrolSpeed => animalPatrolSpeed;
+    public float AnimalPatrolOffset => animalPatrolOffset;
     public float AnimalCaptureRadius => animalCaptureRadius;
-    public float AnimalSpawnInterval => animalSpawnInterval;
-    public float YardOffset => yardOffset;
+    public float MaxSpawnInterval => maxSpawnInterval;
 }

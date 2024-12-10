@@ -17,6 +17,11 @@ public class MainHero : MonoBehaviour
         collider.radius = _config.AnimalCaptureRadius;
     }
 
+    private void Start()
+    {
+        _targetPosition = transform.position;
+    }
+
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))

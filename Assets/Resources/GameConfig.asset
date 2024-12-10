@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   heroSpeed: 5
   maxGroupSize: 5
+  animalCaptureRadius: 0.5
   animalFollowSpeed: 3
+  animalPatrolSpeed: 1
+  animalPatrolRange: 1
+  animalPatrolOffset: 0.5
+  animalPoolSize: 10
   animalSpawnInterval: 5
-  spawnPositionRange: {x: 8, y: 4}

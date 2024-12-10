@@ -8,11 +8,18 @@ public class UiManager : MonoBehaviour
     private TextMeshProUGUI scoreText;
 
     private UserData _userData;
+    private SignalBus _signalBus;
 
     [Inject]
-    private void Construct(UserData userData)
+    private void Construct(UserData userData, SignalBus signalBus)
     {
         _userData = userData;
+        _signalBus = signalBus;
+    }
+
+    private void Start()
+    {
+        _signalBus.Fire<ResetScoreSignal>();
     }
 
     private void OnEnable()

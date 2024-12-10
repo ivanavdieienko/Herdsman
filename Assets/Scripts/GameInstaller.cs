@@ -23,11 +23,16 @@ public class GameInstaller : MonoInstaller
         SignalBusInstaller.Install(Container);
         Container.DeclareSignal<AnimalDetectedSignal>();
         Container.DeclareSignal<AnimalDeliveredSignal>();
+        Container.DeclareSignal<ResetScoreSignal>();
 
         Container.Bind<AddScoreCommand>().AsTransient();
+        Container.Bind<ResetScoreCommand>().AsTransient();
 
         Container.BindSignal<AnimalDeliveredSignal>()
             .ToMethod<AddScoreCommand>((cmd, s) => cmd.Execute()).FromResolve();
+
+        Container.BindSignal<ResetScoreSignal>()
+            .ToMethod<ResetScoreCommand>((cmd, s) => cmd.Execute()).FromResolve();
 
         Container.BindInterfacesAndSelfTo<AnimalGroupManager>().AsSingle();
         Container.BindInterfacesAndSelfTo<AnimalSpawner>().AsSingle();

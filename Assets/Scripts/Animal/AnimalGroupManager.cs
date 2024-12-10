@@ -8,11 +8,13 @@ public class AnimalGroupManager : IInitializable, IDisposable
     private readonly List<Animal> _group = new();
     private const int MaxGroupSize = 5;
 
+    private readonly GameConfig _config;
     private readonly SignalBus _signalBus;
     private readonly Transform _heroTransform;
 
-    public AnimalGroupManager(SignalBus signalBus, MainHero heroController)
+    public AnimalGroupManager(SignalBus signalBus, MainHero heroController, GameConfig config)
     {
+        _config = config;
         _signalBus = signalBus;
         _heroTransform = heroController.transform;
     }
@@ -33,7 +35,7 @@ public class AnimalGroupManager : IInitializable, IDisposable
     {
         if (_group.Count < MaxGroupSize && !_group.Contains(signal.Animal))
         {
-            signal.Animal.StartFollowing(_heroTransform);
+            signal.Animal.StartFollowing(_heroTransform, _config.AnimalPatrolOffset, _config.AnimalFollowSpeed);
             _group.Add(signal.Animal);
         }
     }

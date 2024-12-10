@@ -3,71 +3,77 @@ using Zenject;
 
 public class Animal : MonoBehaviour
 {
-    private const string TagYard = "Yard";
-    private const string TagPlayer = "Player";
+    private IAnimalState _currentState;
+    private IAnimalState _patrollingState; //cached state
 
     private Pool _pool;
-    private GameConfig _config;
     private SignalBus _signalBus;
-    private Transform _followTarget;
-    private bool _isFollowing;
 
     [Inject]
-    public void Construct(Pool animalPool, GameConfig config, SignalBus signalBus)
+    public void Construct(Pool pool, SignalBus signalBus)
     {
-        _pool = animalPool;
-        _config = config;
+        _pool = pool;
         _signalBus = signalBus;
     }
 
-    public void Spawn(Vector3 position)
+    public void Initialize(float patrolSpeed, Rect patrolArea, Rect yardArea)
     {
-        transform.position = position;
-        gameObject.SetActive(true);
+        _patrollingState = new PatrollingState(patrolSpeed, patrolArea, yardArea);
+
+        ChangeState(_patrollingState);
     }
 
-    public void Despawn()
+    public void AnimalDetected()
     {
-        gameObject.SetActive(false);
+        _signalBus.Fire(new AnimalDetectedSignal { Animal = this });
     }
 
-    public void StartFollowing(Transform target)
+    public void AnimalDelivered()
     {
-        _isFollowing = true;
-        _followTarget = target;
+        _signalBus.Fire(new AnimalDeliveredSignal { Animal = this });
+        _pool.Despawn(this);
+    }
+
+    public void StartFollowing(Transform target, float offset, float followSpeed)
+    {
+        ChangeState(new FollowingState(target, offset, followSpeed));
+    }
+
+    public void StopFollowing()
+    {
+        ChangeState(_patrollingState);
+    }
+
+    private void ChangeState(IAnimalState newState)
+    {
+        _currentState?.ExitState(this);
+        _currentState = newState;
+        _currentState.EnterState(this);
     }
 
     private void Update()
     {
-        if (_isFollowing && _followTarget != null)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, _followTarget.position, _config.AnimalFollowSpeed * Time.deltaTime);
-        }
+        _currentState?.UpdateState(this);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag(TagYard))
-        {
-            _signalBus.Fire(new AnimalDeliveredSignal { Animal = this });
-            _pool.Despawn(this);
-        }
-        else if (collision.CompareTag(TagPlayer))
-        {
-            _signalBus.Fire(new AnimalDetectedSignal { Animal = this });
-        }
+        _currentState.HandleCollision(collision, this);
     }
+
 
     public class Pool : MonoMemoryPool<Vector3, Animal>
     {
         protected override void Reinitialize(Vector3 position, Animal animal)
         {
-            animal.Spawn(position);
+            animal.transform.position = position;
+            animal.gameObject.SetActive(true);
         }
 
         protected override void OnDespawned(Animal animal)
         {
-            animal.Despawn();
+            animal.StopFollowing();
+            animal.gameObject.SetActive(false);
         }
     }
 }
